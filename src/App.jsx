@@ -1,16 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import { Toaster } from "../src/components/ui/toaster";
+import { Toaster as Sonner } from "sonner";
+import { TooltipProvider } from "../src/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Index from "./pages/Index";
+import FacultyLogin from "./pages/FacultyLogin";
+import FacultyDashboard from "./pages/FacultyDashboard";
+import NotFound from "./pages/NotFound";
+import UnderDevLogin from "./components/underdevelopmentLogin";
 
-function App() {
-  const [count, setCount] = useState(0)
+const queryClient = new QueryClient();
+
+const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
+
+  if (!isLoggedIn) {
+    return <UnderDevLogin onLogin={handleLogin} />;
+  }
 
   return (
-    <>
-     <h2 className='font-bold text-center text-orange-600'>Tailwind is configured</h2>
-    </>
-  )
-}
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/faculty-login" element={<FacultyLogin />} />
+            <Route path="/faculty-dashboard" element={<FacultyDashboard />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
-export default App
+export default App;
