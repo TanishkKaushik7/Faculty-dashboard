@@ -1,10 +1,75 @@
-import { Button } from "../components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { useNavigate } from "react-router-dom";
+import React from "react";
 import { GraduationCap, User, BookOpen } from "lucide-react";
+import { useNavigate } from "react-router-dom"; // Re-added useNavigate
 
 const Index = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Initialized useNavigate
+
+  // --- Helper Components (mimicking Shadcn UI components with Tailwind CSS) ---
+
+  // Card Component
+  const Card = ({ children, className = "" }) => (
+    <div className={`rounded-lg border border-gray-200 bg-card text-card-foreground shadow-sm ${className}`}>
+      {children}
+    </div>
+  );
+  const CardHeader = ({ children, className = "" }) => (
+    <div className={`flex flex-col space-y-1.5 p-6 ${className}`}>{children}</div>
+  );
+  const CardTitle = ({ children, className = "" }) => (
+    <h3 className={`text-2xl font-semibold leading-none tracking-tight ${className}`}>
+      {children}
+    </h3>
+  );
+  const CardDescription = ({ children, className = "" }) => (
+    <p className={`text-sm text-muted-foreground ${className}`}>{children}</p>
+  );
+  const CardContent = ({ children, className = "" }) => (
+    <div className={`p-6 pt-0 ${className}`}>{children}</div>
+  );
+
+  // Button Component
+  const Button = ({ variant = "default", size = "default", className = "", onClick, children, disabled = false, type = "button" }) => {
+    let baseStyles = "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
+    let variantStyles = "";
+    let sizeStyles = "";
+
+    switch (variant) {
+      case "default":
+        variantStyles = "bg-blue-600 text-white hover:bg-blue-700"; // Primary button style
+        break;
+      case "outline":
+        variantStyles = "border border-gray-300 bg-white hover:bg-gray-100 hover:text-gray-900"; // Outline button style
+        break;
+      // Add other variants if needed
+    }
+
+    switch (size) {
+      case "default":
+        sizeStyles = "h-10 px-4 py-2";
+        break;
+      case "sm":
+        sizeStyles = "h-9 rounded-md px-3";
+        break;
+      // Add other sizes if needed
+    }
+
+    return (
+      <button
+        type={type}
+        className={`${baseStyles} ${variantStyles} ${sizeStyles} ${className}`}
+        onClick={onClick}
+        disabled={disabled}
+      >
+        {children}
+      </button>
+    );
+  };
+
+  // Restored the original navigation for handleFacultyLogin
+  const handleFacultyLogin = () => {
+    navigate('/faculty-login');
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
@@ -34,9 +99,9 @@ const Index = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button 
-                className="w-full bg-blue-600 hover:bg-blue-700"
-                onClick={() => navigate('/faculty-login')}
+              <Button
+                className="w-full bg-blue-600 text-white hover:bg-blue-700"
+                onClick={handleFacultyLogin}
               >
                 Faculty Login
               </Button>
@@ -52,8 +117,8 @@ const Index = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button 
-                className="w-full bg-green-600 hover:bg-green-700"
+              <Button
+                className="w-full bg-green-600 text-white hover:bg-green-700"
                 onClick={() => window.open('https://student.gbu.ac.in', '_blank')}
               >
                 Student Dashboard

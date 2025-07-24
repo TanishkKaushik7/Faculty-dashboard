@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Toaster } from "../src/components/ui/toaster";
+// import { Toaster } from "../src/components/ui/toaster";
 import { Toaster as Sonner } from "sonner";
-import { TooltipProvider } from "../src/components/ui/tooltip";
+// import { TooltipProvider } from "../src/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
@@ -25,8 +25,8 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
+      
+        
         <Sonner />
         <BrowserRouter>
           <Routes>
@@ -36,7 +36,7 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
-      </TooltipProvider>
+      
     </QueryClientProvider>
   );
 };

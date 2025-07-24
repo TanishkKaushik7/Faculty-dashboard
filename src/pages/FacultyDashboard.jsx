@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import FacultyHeader from "../components/FacultyHeader";
 import FacultySidebar from "../components/FacultySidebar";
 import DashboardHome from "../components/dashboard/DashboardHome";
@@ -24,7 +24,8 @@ const FacultyDashboard = () => {
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard":
-        return <DashboardHome />;
+        // Pass the handleTabChange function to DashboardHome
+        return <DashboardHome onNavigate={handleTabChange} />;
       case "profile":
         return <FacultyProfile />;
       case "courses":
@@ -54,7 +55,7 @@ const FacultyDashboard = () => {
       case "social":
         return <SocialImpactModule />;
       default:
-        return <DashboardHome />;
+        return <DashboardHome onNavigate={handleTabChange} />; // Also pass for default
     }
   };
 
@@ -75,21 +76,21 @@ const FacultyDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex w-full">
-      <FacultySidebar 
+    <div className="min-h-screen bg-gray-50">
+      <FacultySidebar
         isOpen={isSidebarOpen}
         activeTab={activeTab}
         onTabChange={handleTabChange}
         onClose={handleSidebarClose}
       />
-      
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <FacultyHeader 
+
+      <div className="xl:ml-64">
+        <FacultyHeader
           onMenuToggle={handleSidebarToggle}
           isSidebarOpen={isSidebarOpen}
         />
-        
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+
+        <main className="pt-12 mt-15.5 p-4 sm:p-6">
           {renderContent()}
         </main>
       </div>
