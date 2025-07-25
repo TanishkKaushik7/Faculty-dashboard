@@ -416,6 +416,57 @@ const LeaveDetailsModal = React.memo(({ isOpen, onClose, leaveRequest }) => {
 });
 LeaveDetailsModal.displayName = "LeaveDetailsModal";
 
+// Tabs components - MOVED OUTSIDE AttendanceModule
+const Tabs = ({ defaultValue, children, className, ...props }) => {
+    // This is a wrapper component that doesn't directly manage activeTab state,
+    // but expects its children (TabsContent and TabsList) to handle it.
+    // The activeTab state is now managed within AttendanceModule.
+    return (
+        <div className={`space-y-6 ${className}`} {...props}>
+            {children}
+        </div>
+    );
+};
+Tabs.displayName = "Tabs";
+
+const TabsContent = ({ value, children, activeTab, ...props }) => { // Added activeTab prop
+    return value === activeTab ? (
+        <div className="pt-4 sm:pt-6 space-y-6" {...props}>
+            {children}
+        </div>
+    ) : null;
+};
+TabsContent.displayName = "TabsContent";
+
+const TabsList = React.memo(({ className, children, activeTab, setActiveTab, ...props }) => ( // Added activeTab, setActiveTab props
+  <div className={`inline-flex h-10 items-center justify-center rounded-md bg-gray-100 p-1 text-gray-700 ${className}`} {...props}>
+    {React.Children.map(children, child => {
+      if (React.isValidElement(child)) {
+        return React.cloneElement(child, {
+          active: child.props.value === activeTab,
+          onClick: () => setActiveTab(child.props.value)
+        });
+      }
+      return child;
+    })}
+  </div>
+));
+TabsList.displayName = "TabsList";
+
+const TabsTrigger = React.memo(({ value, className, children, active, onClick, ...props }) => ( // Added active prop
+  <button
+    className={`inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:shadow-sm focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+      active ? "bg-white shadow-sm" : " hover:bg-gray-50"
+    } ${className}`}
+    onClick={onClick}
+    {...props}
+  >
+    {children}
+  </button>
+));
+TabsTrigger.displayName = "TabsTrigger";
+
+
 const AttendanceModule = () => {
   const [selectedCourse, setSelectedCourse] = useState("CS-201");
   const [topicDiscussed, setTopicDiscussed] = useState("");
@@ -713,49 +764,6 @@ const AttendanceModule = () => {
     );
   });
 
-  // Tabs components
-  const Tabs = ({ defaultValue, children, className, ...props }) => {
-    return (
-      <div className={`space-y-6 ${className}`} {...props}>
-        {children}
-      </div>
-    );
-  };
-
-  const TabsContent = ({ value, children, ...props }) => {
-    return value === activeTab ? (
-      <div className="pt-4 sm:pt-6 space-y-6" {...props}>
-        {children}
-      </div>
-    ) : null;
-  };
-
-  const TabsList = ({ className, children, ...props }) => (
-    <div className={`inline-flex h-10 items-center justify-center rounded-md bg-gray-100 p-1 text-gray-700 ${className}`} {...props}>
-      {React.Children.map(children, child => {
-        if (React.isValidElement(child)) {
-          return React.cloneElement(child, {
-            active: child.props.value === activeTab,
-            onClick: () => setActiveTab(child.props.value)
-          });
-        }
-        return child;
-      })}
-    </div>
-  );
-
-  const TabsTrigger = ({ value, className, children, active, onClick, ...props }) => (
-    <button
-      className={`inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:shadow-sm focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
-        active ? "bg-white shadow-sm" : " hover:bg-gray-50"
-      } ${className}`}
-      onClick={onClick}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-
   return (
     <div className="space-y-6 p-4 sm:p-6">
       {/* Header with responsive date display */}
@@ -794,6 +802,7 @@ const AttendanceModule = () => {
                   value="mark-attendance"
                   className="w-full justify-start bg-white px-4 py-2 text-sm"
                   onClick={() => handleMobileTabChange("mark-attendance")}
+                  active={activeTab === "mark-attendance"} // Pass active prop
                 >
                   <CheckCircle className="h-4 w-4 mr-2" />
                   Mark Attendance
@@ -802,6 +811,7 @@ const AttendanceModule = () => {
                   value="attendance-reports"
                   className="w-full justify-start bg-white px-4 py-2 text-sm"
                   onClick={() => handleMobileTabChange("attendance-reports")}
+                  active={activeTab === "attendance-reports"} // Pass active prop
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Reports
@@ -810,6 +820,7 @@ const AttendanceModule = () => {
                   value="class-summary"
                   className="w-full justify-start bg-white px-4 py-2 text-sm"
                   onClick={() => handleMobileTabChange("class-summary")}
+                  active={activeTab === "class-summary"} // Pass active prop
                 >
                   <Calendar className="h-4 w-4 mr-2" />
                   Class Summary
@@ -818,6 +829,7 @@ const AttendanceModule = () => {
                   value="student-leave"
                   className="w-full justify-start bg-white px-4 py-2 text-sm"
                   onClick={() => handleMobileTabChange("student-leave")}
+                  active={activeTab === "student-leave"} // Pass active prop
                 >
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Leave Requests
@@ -828,7 +840,7 @@ const AttendanceModule = () => {
         </div>
 
         {/* Desktop Tabs */}
-        <TabsList className="hidden sm:grid w-full grid-cols-4 gap-2 bg-gray-50 p-1 rounded-lg">
+        <TabsList className="hidden sm:grid w-full grid-cols-4 gap-2 bg-gray-50 p-1 rounded-lg" activeTab={activeTab} setActiveTab={setActiveTab}>
           <TabsTrigger
             value="mark-attendance"
             className="py-2 text-sm flex items-center justify-center"
@@ -860,7 +872,7 @@ const AttendanceModule = () => {
         </TabsList>
 
         {/* Mark Attendance Tab */}
-        <TabsContent value="mark-attendance" className="pt-4 sm:pt-6 space-y-6">
+        <TabsContent value="mark-attendance" activeTab={activeTab} className="pt-4 sm:pt-6 space-y-6">
           {/* Course Selection - Responsive Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {courses.map((course) => (
@@ -1027,7 +1039,7 @@ const AttendanceModule = () => {
         </TabsContent>
 
         {/* Reports Tab */}
-        <TabsContent value="attendance-reports" className="pt-4 sm:pt-6">
+        <TabsContent value="attendance-reports" activeTab={activeTab} className="pt-4 sm:pt-6">
           <Card className="border border-gray-200">
             <CardHeader>
               <CardTitle>Attendance Reports & Analytics</CardTitle>
@@ -1088,7 +1100,7 @@ const AttendanceModule = () => {
         </TabsContent>
 
         {/* Class Summary Tab */}
-        <TabsContent value="class-summary" className="pt-4 sm:pt-6">
+        <TabsContent value="class-summary" activeTab={activeTab} className="pt-4 sm:pt-6">
           <Card className="border border-gray-200">
             <CardHeader>
               <CardTitle>Class Summary</CardTitle>
@@ -1188,7 +1200,7 @@ const AttendanceModule = () => {
         </TabsContent>
 
         {/* Student Leave Tab */}
-        <TabsContent value="student-leave" className="pt-4 sm:pt-6 space-y-6">
+        <TabsContent value="student-leave" activeTab={activeTab} className="pt-4 sm:pt-6 space-y-6">
           <Card className="border border-gray-200">
             <CardHeader>
               <div className="flex flex-col sm:flex-row sm:items-center  justify-between gap-4">
